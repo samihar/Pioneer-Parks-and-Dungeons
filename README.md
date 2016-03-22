@@ -3,7 +3,7 @@
 This README would normally document whatever steps are necessary to get your application up and running.
 
 ### What is this repository for? ###
-* Link to Google Doc planning: [https://docs.google.com/document/d/1TDK_7VOteBMwbkUwLRw8TXgEL_ivcYGVHSyr34XfxUE/edit?usp=sharing](Link URL)
+* [Link to Google Doc Planning](https://docs.google.com/document/d/1TDK_7VOteBMwbkUwLRw8TXgEL_ivcYGVHSyr34XfxUE/edit?usp=sharing)
 * Quick summary
 * Version
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
