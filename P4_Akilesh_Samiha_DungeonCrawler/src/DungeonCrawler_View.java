@@ -7,22 +7,27 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class DungeonCrawler_View {
 	// testing
 	
+	BufferedImage[][] gameBoard;
+	
 	MyGUI gui;
 	
 	public DungeonCrawler_View() {
-		gui = new MyGUI();
+		
+		//DEBUG
+		gameBoard = new BufferedImage[10][10];
+		
+		
+		gui = new MyGUI(gameBoard);
+		
+		// use this method whenever an updated gameBoard needs to be given.
+		gui.drawingPanel.giveOuterArray(gameBoard);
 	}
 }
 
@@ -44,7 +49,7 @@ class MyGUI implements ActionListener {
 	 */
 	Color[][] saveState = new Color[20][20];
 
-	MyGUI() {
+	MyGUI(BufferedImage[][] input) {
 
 		// Create Java Window
 		JFrame window = new JFrame("DungeonCrawler");
@@ -56,6 +61,8 @@ class MyGUI implements ActionListener {
 		
 		// JPanel to draw in
 		drawingPanel = new MyDrawingPanel();
+		drawingPanel.localGameBoard = input;
+		
 		drawingPanel.setBounds(20, 20, 400, 400);
 		drawingPanel.setBorder(BorderFactory.createEtchedBorder());
 
@@ -123,6 +130,14 @@ class MyGUI implements ActionListener {
 	}
 
 	class MyDrawingPanel extends JPanel {
+		
+		// LOCAL ARRAY OF IMAGES
+		BufferedImage[][] localGameBoard;
+		
+		// how we get the outside array to the inside
+		public void giveOuterArray(BufferedImage[][] input) {
+			localGameBoard = input;
+		}
 
 		static final long serialVersionUID = 1234567890L;
 
@@ -138,10 +153,7 @@ class MyGUI implements ActionListener {
 			for (int row = 0; row < 10; row++) {
 
 				for (int col = 0; col < 10; col++) {
-					// g.setColor(saveState[row][col]);
-
-					// g.drawImage(storage[row][col], col * 40, row * 40, 40, 40, null);
-					// System.out.println("X = " + x + ", Y = " + y);
+					g.drawImage(localGameBoard[row][col], col * 40, row * 40, 40, 40, null);
 
 				}
 
