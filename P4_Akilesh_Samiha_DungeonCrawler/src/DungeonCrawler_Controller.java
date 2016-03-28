@@ -1,4 +1,3 @@
-
 public class DungeonCrawler_Controller {
 	DungeonCrawler_Model model;
 	DungeonCrawler_View view;
@@ -11,4 +10,6 @@ public class DungeonCrawler_Controller {
 	public void play(){
 		System.out.println("Play Game");
 	}
+	
+	
 }
