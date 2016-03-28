@@ -13,22 +13,31 @@ import javax.swing.JPanel;
 
 public class DungeonCrawler_View {
 	// testing
-	
+
 	BufferedImage[][] gameBoard;
+
 	
 	MyGUI gui;
-	
+
 	public DungeonCrawler_View() {
-		
-		//DEBUG
+
+		// DEBUG
 		gameBoard = new BufferedImage[10][10];
-		
-		
+
 		gui = new MyGUI(gameBoard);
-		
+
 		// use this method whenever an updated gameBoard needs to be given.
 		gui.drawingPanel.giveOuterArray(gameBoard);
 	}
+	
+	public BufferedImage[][] getGameBoard() {
+		return gameBoard;
+	}
+
+	public void setGameBoard(BufferedImage[][] gameBoard) {
+		this.gameBoard = gameBoard;
+	}
+
 }
 
 class MyGUI implements ActionListener {
@@ -36,12 +45,11 @@ class MyGUI implements ActionListener {
 	// Attributes
 	Color color = Color.RED;
 	MyDrawingPanel drawingPanel;
-	
+
 	int count = 0;
 
 	JLabel devs = new JLabel("S.R. / A.P.");
-	
-	
+
 	JLabel ver = new JLabel("0.5");
 
 	/*
@@ -58,11 +66,11 @@ class MyGUI implements ActionListener {
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Create GUI elements
-		
+
 		// JPanel to draw in
 		drawingPanel = new MyDrawingPanel();
 		drawingPanel.localGameBoard = input;
-		
+
 		drawingPanel.setBounds(20, 20, 400, 400);
 		drawingPanel.setBorder(BorderFactory.createEtchedBorder());
 
@@ -92,11 +100,9 @@ class MyGUI implements ActionListener {
 		flavorPanel2.setBorder(BorderFactory.createTitledBorder("Version"));
 		flavorPanel2.setBounds(270, 425, 100, 70);
 		flavorPanel2.add(ver);
-		
-		
+
 		// ADD ALL PANELS
-		
-		
+
 		mainPanel.add(drawingPanel);
 
 		mainPanel.add(flavorPanel);
@@ -130,10 +136,10 @@ class MyGUI implements ActionListener {
 	}
 
 	class MyDrawingPanel extends JPanel {
-		
+
 		// LOCAL ARRAY OF IMAGES
 		BufferedImage[][] localGameBoard;
-		
+
 		// how we get the outside array to the inside
 		public void giveOuterArray(BufferedImage[][] input) {
 			localGameBoard = input;
@@ -141,11 +147,10 @@ class MyGUI implements ActionListener {
 
 		static final long serialVersionUID = 1234567890L;
 
-
 		public void paintComponent(Graphics g) {
 
-			
-			// This is what repaint calls, so we place the drawImg and stuff here.
+			// This is what repaint calls, so we place the drawImg and stuff
+			// here.
 
 			int x = 0;
 			int y = 0;
