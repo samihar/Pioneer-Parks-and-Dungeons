@@ -24,9 +24,19 @@ class Character{
 	}
 	public void setName(String name) {
 		this.name = name;
+	}	
+	
+}
+
+class Monster{
+	int health;
+
+	public int getHealth() {
+		return health;
 	}
-	
-	
-	
+
+	public void setHealth(int health) {
+		this.health = health;
+	}
 	
 }
