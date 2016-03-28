@@ -1,12 +1,22 @@
 
 public class DungeonCrawler_Model {
-
+	Player student;
+	public DungeonCrawler_Model(){
+		student = new Player();
+	}
 }
 
-class Character{
+class Player{
 	int myHealth;
 	int myLatePasses;
 	String name;
+	
+	public Player(){
+		myHealth = 10;
+		myLatePasses = 0;
+		name = "Bob";
+	}	
+	
 	public int getMyHealth() {
 		return myHealth;
 	}
@@ -30,6 +40,10 @@ class Character{
 
 class Monster{
 	int health;
+	
+	public Monster(){
+		health = 5;
+	}
 
 	public int getHealth() {
 		return health;
