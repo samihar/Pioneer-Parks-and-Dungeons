@@ -4,32 +4,37 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class DungeonCrawler_View {
 	// testing
 
 	BufferedImage[][] gameBoard;
+	Boolean[][] playerBoard;
 
-	
 	MyGUI gui;
 
 	public DungeonCrawler_View() {
 
 		// DEBUG
 		gameBoard = new BufferedImage[10][10];
+		playerBoard = new Boolean[10][10];
 
-		gui = new MyGUI(gameBoard);
+		gui = new MyGUI(gameBoard, playerBoard);
 
 		// use this method whenever an updated gameBoard needs to be given.
 		gui.drawingPanel.giveOuterArray(gameBoard);
 	}
-	
+
 	public BufferedImage[][] getGameBoard() {
 		return gameBoard;
 	}
@@ -45,7 +50,8 @@ class MyGUI implements ActionListener {
 	// Attributes
 	Color color = Color.RED;
 	MyDrawingPanel drawingPanel;
-
+	MyPlayerPanel playerPanel;
+	JFrame window;
 	int count = 0;
 
 	JLabel devs = new JLabel("S.R. / A.P.");
@@ -57,10 +63,10 @@ class MyGUI implements ActionListener {
 	 */
 	Color[][] saveState = new Color[20][20];
 
-	MyGUI(BufferedImage[][] input) {
+	MyGUI(BufferedImage[][] input, Boolean[][] player) {
 
 		// Create Java Window
-		JFrame window = new JFrame("DungeonCrawler");
+		window = new JFrame("DungeonCrawler");
 		window.setBounds(100, 100, 445, 600);
 		window.setResizable(false);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -73,6 +79,10 @@ class MyGUI implements ActionListener {
 
 		drawingPanel.setBounds(20, 20, 400, 400);
 		drawingPanel.setBorder(BorderFactory.createEtchedBorder());
+
+		playerPanel = new MyPlayerPanel();
+		playerPanel.playerBoard = player;
+		playerPanel.setBounds(20, 20, 400, 400);
 
 		// JButton
 		JButton button = new JButton("Reset");
@@ -104,7 +114,7 @@ class MyGUI implements ActionListener {
 		// ADD ALL PANELS
 
 		mainPanel.add(drawingPanel);
-
+		mainPanel.add(playerPanel);
 		mainPanel.add(flavorPanel);
 		mainPanel.add(flavorPanel2);
 
@@ -113,6 +123,10 @@ class MyGUI implements ActionListener {
 		// Let there be light
 		window.setVisible(true);
 
+	}
+
+	public void printLosingMessage() {
+		JOptionPane.showInternalMessageDialog(window, "Sorry, you lost.", "Sorry", JOptionPane.PLAIN_MESSAGE);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -160,6 +174,44 @@ class MyGUI implements ActionListener {
 				for (int col = 0; col < 10; col++) {
 					g.drawImage(localGameBoard[row][col], col * 40, row * 40, 40, 40, null);
 
+				}
+
+			}
+
+		}
+	}
+
+	class MyPlayerPanel extends JPanel {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		// LOCAL ARRAY OF IMAGES
+		Boolean[][] playerBoard;
+		BufferedImage playerImg;
+
+		public MyPlayerPanel(){
+			//setPlayerArray();
+		}
+		// how we get the outside array to the inside
+		public void setPlayerArray(Boolean[][] input) {
+			playerBoard = input;
+		}
+
+		public void setPlayer(BufferedImage input) {
+			playerImg = input;
+		}
+
+		public void paintComponent(Graphics g) {
+
+			// This is what repaint calls, so we place the drawImg and stuff
+			// here.
+
+			for (int row = 0; row < 10; row++) {
+				for (int col = 0; col < 10; col++) {
+					if(playerBoard[row][col])
+						g.drawImage(playerImg, col * 40, row * 40, 40, 40, null);
 				}
 
 			}

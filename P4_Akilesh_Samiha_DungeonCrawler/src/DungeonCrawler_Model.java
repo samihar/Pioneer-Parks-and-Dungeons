@@ -9,9 +9,30 @@ import javax.imageio.ImageIO;
 
 public class DungeonCrawler_Model {
 	Player student;
-
+	Boolean  [][]  playerPath;
+	static final int[] INITIAL_POSITION_LEVEL_1 = {8,4};
+			
 	public DungeonCrawler_Model() {
 		student = new Player();
+		playerPath = new Boolean[10][10];
+		resetPlayerPath();
+	}
+	
+	public void resetPlayerPath(){
+		for (int i = 0; i < playerPath.length; i++) {
+			for (int j = 0; j < playerPath[0].length; j++) {
+				this.playerPath[i][j] = false;
+			}
+		}
+		setPlayerPath(INITIAL_POSITION_LEVEL_1[0], INITIAL_POSITION_LEVEL_1[1], true);
+	}
+	
+	public void setPlayerPath(int  i, int j, boolean hasPlayer) {
+		this.playerPath[i][j] = hasPlayer;
+	}
+
+	public Boolean[][] getPlayerPath() {
+		return playerPath;
 	}
 
 	public BufferedImage[][] loadLevel(int numLevel) {
@@ -33,7 +54,6 @@ public class DungeonCrawler_Model {
 					boolean walkable = false;
 					if (walk.equals("true"))
 						walkable = true;
-					System.out.println(str + " " + walk);
 					Tile t = new Tile(tileImg, walkable);
 					list.add(tileImg);
 				} catch (IOException e) {
@@ -62,9 +82,26 @@ class Tile {
 		tileImage = img;
 		walkable = walk;
 	}
+	
+	public BufferedImage getTileImage() {
+		return tileImage;
+	}
+
+	public void setTileImage(BufferedImage tileImage) {
+		this.tileImage = tileImage;
+	}
+
+	public boolean isWalkable() {
+		return walkable;
+	}
+
+	public void setWalkable(boolean walkable) {
+		this.walkable = walkable;
+	}
 }
 
 class Player {
+	BufferedImage playerImg;
 	int myHealth;
 	int myLatePasses;
 	String name;
@@ -73,8 +110,22 @@ class Player {
 		myHealth = 10;
 		myLatePasses = 0;
 		name = "Bob";
+		setPlayerImg("player_sprite.png");
 	}
 
+	public BufferedImage getPlayerImg() {
+		return playerImg;
+	}
+
+	public void setPlayerImg(String fileName) {
+		try {
+			this.playerImg = ImageIO.read(new File(fileName));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public int getMyHealth() {
 		return myHealth;
 	}
