@@ -2,12 +2,10 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -131,6 +129,10 @@ class MyGUI implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 
+	}
+	
+	public void addKeyListener(KeyListener k) {
+		drawingPanel.addKeyListener(k);
 	}
 
 	public void addMouseListener(MouseListener m) {

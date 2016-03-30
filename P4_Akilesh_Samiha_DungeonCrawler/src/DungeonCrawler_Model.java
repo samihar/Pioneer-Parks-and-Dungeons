@@ -11,6 +11,7 @@ public class DungeonCrawler_Model {
 	Player student;
 	Boolean  [][]  playerPath;
 	static final int[] INITIAL_POSITION_LEVEL_1 = {8,4};
+	public Tile[][] gameBoard = new Tile[10][10];
 			
 	public DungeonCrawler_Model() {
 		student = new Player();
@@ -30,6 +31,14 @@ public class DungeonCrawler_Model {
 	public void setPlayerPath(int  i, int j, boolean hasPlayer) {
 		this.playerPath[i][j] = hasPlayer;
 	}
+	
+	// MOVING PLAYER (UP/LEFT/DOWN/RIGHT)
+	public void moveRight(int currI, int currJ) {
+		// Remove player from current spot
+		if ( gameBoard[currI+1][currJ].isWalkable() ) {
+			
+		}
+	}
 
 	public Boolean[][] getPlayerPath() {
 		return playerPath;
@@ -38,6 +47,8 @@ public class DungeonCrawler_Model {
 	public BufferedImage[][] loadLevel(int numLevel) {
 		BufferedImage[][] level = new BufferedImage[10][10];
 		ArrayList<BufferedImage> list = new ArrayList<BufferedImage>();
+		
+		ArrayList<Tile> tileStorage = new ArrayList<Tile>();
 		try {
 			Scanner in = null;
 			if (numLevel == 1)
@@ -54,7 +65,11 @@ public class DungeonCrawler_Model {
 					boolean walkable = false;
 					if (walk.equals("true"))
 						walkable = true;
+					
 					Tile t = new Tile(tileImg, walkable);
+					// Add the tile we created to a tileStorage ArrayList
+					tileStorage.add(t);
+					
 					list.add(tileImg);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -65,9 +80,17 @@ public class DungeonCrawler_Model {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// ADD IMAGES TO THE BUFFEREDIMAGE ARRAY TO GIVE TO VIEW
 		for (int i = 0; i < level.length; i++) {
 			for (int j = 0; j < level[0].length; j++) {
 				level[i][j] = list.remove(0);
+			}
+		}
+		System.out.println(tileStorage);
+		// ADD TILES TO GAMEBOARD
+		for (int i = 0; i < gameBoard.length; i++) {
+			for (int j = 0; j < gameBoard[0].length; j++) {
+				gameBoard[i][j] = tileStorage.remove(0);
 			}
 		}
 		return level;
@@ -97,6 +120,11 @@ class Tile {
 
 	public void setWalkable(boolean walkable) {
 		this.walkable = walkable;
+	}
+	
+	@Override
+	public String toString() {
+		return "[ " + walkable + " ]";
 	}
 }
 
