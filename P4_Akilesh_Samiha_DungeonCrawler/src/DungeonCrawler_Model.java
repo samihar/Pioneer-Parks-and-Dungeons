@@ -41,14 +41,14 @@ public class DungeonCrawler_Model {
 		try {
 			Scanner in = null;
 			if (numLevel == 1)
-				in = new Scanner(new File("level1.txt"));
+				in = new Scanner(new File("levels/level1.txt"));
 			else if (numLevel == 2) {
-				in = new Scanner(new File("level2.txt"));
+				in = new Scanner(new File("levels/level2.txt"));
 			}
 			while (in != null && in.hasNext()) {
 				try {
 					String str = in.next().substring(1);
-					BufferedImage tileImg = ImageIO.read(new File(str));
+					BufferedImage tileImg = ImageIO.read(new File("img/" + str));
 					String str2 = in.next();
 					String walk = str2.substring(0, str2.length() - 1);
 					boolean walkable = false;
@@ -119,7 +119,7 @@ class Player {
 
 	public void setPlayerImg(String fileName) {
 		try {
-			this.playerImg = ImageIO.read(new File(fileName));
+			this.playerImg = ImageIO.read(new File("img/" + fileName));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
