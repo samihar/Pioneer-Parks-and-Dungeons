@@ -9,44 +9,14 @@ import javax.imageio.ImageIO;
 
 public class DungeonCrawler_Model {
 	Player student;
-	int numLevel;
 	Boolean  [][]  playerPath;
 	static final int[] INITIAL_POSITION_LEVEL_1 = {8,4};
-	static final int[] INITIAL_POSITION_LEVEL_2 = {1,0};
 	public Tile[][] gameBoard = new Tile[10][10];
-	static final int[] STAIR_POSITION_LEVEL_1_1 = {0,4};
-	static final int[] STAIR_POSITION_LEVEL_1_2 = {0,5};
-	static final int[] STAIR_POSITION_LEVEL_2 = {1,9};
-	
+			
 	public DungeonCrawler_Model() {
-		numLevel = 0;
 		student = new Player();
 		playerPath = new Boolean[10][10];
 		resetPlayerPath();
-	}
-	
-	public int[] getPlayerPos(){
-		for (int i = 0; i < playerPath.length; i++) {
-			for (int j = 0; j < playerPath.length; j++) {
-				if (playerPath[i][j]){
-					int[] pos = {i,j};
-					return pos;
-				}
-			}
-		}
-		int[] pos = {-1,-1};
-		return pos;
-	}
-	
-	public boolean atStairs(){
-		int[] pos  = getPlayerPos();
-		if (numLevel %  2 == 1)
-			return (pos[0] == STAIR_POSITION_LEVEL_1_1[0] &&  pos[1] == STAIR_POSITION_LEVEL_1_1[1])||
-					(pos[0] == STAIR_POSITION_LEVEL_1_2[0] &&  pos[1] == STAIR_POSITION_LEVEL_1_2[1]);
-		else if (numLevel % 2 == 0) {
-			return pos[0] == STAIR_POSITION_LEVEL_2[0] &&  pos[1] == STAIR_POSITION_LEVEL_2[1];
-		}
-		 return false;
 	}
 	
 	public void resetPlayerPath(){
@@ -55,12 +25,7 @@ public class DungeonCrawler_Model {
 				this.playerPath[i][j] = false;
 			}
 		}
-		if (numLevel %  2 == 1)
-			setPlayerPath(INITIAL_POSITION_LEVEL_1[0], INITIAL_POSITION_LEVEL_1[1], true);
-		else if (numLevel % 2 == 0) {
-			setPlayerPath(INITIAL_POSITION_LEVEL_2[0], INITIAL_POSITION_LEVEL_2[1], true);
-		}
-		
+		setPlayerPath(INITIAL_POSITION_LEVEL_1[0], INITIAL_POSITION_LEVEL_1[1], true);
 	}
 	
 	public void setPlayerPath(int  i, int j, boolean hasPlayer) {
@@ -79,17 +44,16 @@ public class DungeonCrawler_Model {
 		return playerPath;
 	}
 
-	public BufferedImage[][] loadLevel(int numLev) {
-		numLevel = numLev;
+	public BufferedImage[][] loadLevel(int numLevel) {
 		BufferedImage[][] level = new BufferedImage[10][10];
 		ArrayList<BufferedImage> list = new ArrayList<BufferedImage>();
 		
 		ArrayList<Tile> tileStorage = new ArrayList<Tile>();
 		try {
 			Scanner in = null;
-			if (numLevel %  2 == 1)
+			if (numLevel == 1)
 				in = new Scanner(new File("levels/level1.txt"));
-			else if (numLevel % 2 == 0) {
+			else if (numLevel == 2) {
 				in = new Scanner(new File("levels/level2.txt"));
 			}
 			while (in != null && in.hasNext()) {
