@@ -9,6 +9,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -69,6 +72,22 @@ class MyGUI implements ActionListener {
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Create GUI elements
+		JMenuBar menubar = new JMenuBar();
+
+		JMenu gameMenu = new JMenu("Game");
+		JMenuItem newGame = new JMenuItem("New Game");
+		JMenuItem exit = new JMenuItem("Exit");
+		gameMenu.add(newGame);
+		gameMenu.add(exit);
+
+		JMenu helpMenu = new JMenu("Help");
+		JMenuItem howToPlay = new JMenuItem("How To Play");
+		JMenuItem about = new JMenuItem("About");
+		helpMenu.add(howToPlay);
+		helpMenu.add(about);
+
+		menubar.add(gameMenu);
+		menubar.add(helpMenu);
 
 		// JPanel to draw in
 		drawingPanel = new MyDrawingPanel();
@@ -114,7 +133,8 @@ class MyGUI implements ActionListener {
 		mainPanel.add(playerPanel);
 		mainPanel.add(flavorPanel);
 		mainPanel.add(flavorPanel2);
-
+		
+		window.setJMenuBar(menubar);
 		window.getContentPane().add(mainPanel);
 
 		// Let there be light
@@ -129,8 +149,7 @@ class MyGUI implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 
 	}
-	
-	
+
 	public void addMouseListener(MouseListener m) {
 		drawingPanel.addMouseListener(m);
 	}
@@ -189,9 +208,10 @@ class MyGUI implements ActionListener {
 		Boolean[][] playerPath;
 		BufferedImage playerImg;
 
-		public MyPlayerPanel(){
-			//setPlayerArray();
+		public MyPlayerPanel() {
+			// setPlayerArray();
 		}
+
 		// how we get the outside array to the inside
 		public void setPlayerArray(Boolean[][] input) {
 			playerPath = input;
@@ -208,7 +228,7 @@ class MyGUI implements ActionListener {
 
 			for (int row = 0; row < 10; row++) {
 				for (int col = 0; col < 10; col++) {
-					if(playerPath[row][col])
+					if (playerPath[row][col])
 						g.drawImage(playerImg, col * 40, row * 40, 40, 40, null);
 				}
 
