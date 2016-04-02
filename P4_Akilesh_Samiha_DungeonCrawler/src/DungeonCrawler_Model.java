@@ -174,7 +174,7 @@ class Player {
 		myHealth = 10;
 		myLatePasses = 0;
 		name = "Bob";
-		setPlayerImg("player_sprite.png");
+		setPlayerImg("player_sprite_up.png");
 	}
 
 	public BufferedImage getPlayerImg() {
@@ -183,7 +183,7 @@ class Player {
 
 	public void setPlayerImg(String fileName) {
 		try {
-			this.playerImg = ImageIO.read(new File("img/" + fileName));
+			this.playerImg = ImageIO.read(new File("img/sprites/" + fileName));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -217,10 +217,35 @@ class Player {
 }
 
 class Monster {
+	BufferedImage monsterImg;
 	int health;
+	String name;
 
-	public Monster() {
+	public Monster(String fileName,String name1) {
 		health = 5;
+		name = name1;
+		setMonsterImg(fileName);
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public BufferedImage getMonsterImg() {
+		return monsterImg;
+	}
+	
+	public void setMonsterImg(String fileName){
+		try {
+			monsterImg = ImageIO.read(new File("img/sprites/" + fileName));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public int getHealth() {
