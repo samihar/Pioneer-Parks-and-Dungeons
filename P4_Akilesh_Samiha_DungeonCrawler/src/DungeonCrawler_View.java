@@ -2,7 +2,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
@@ -79,7 +78,7 @@ class MyGUI implements ActionListener {
 		drawingPanel.setBorder(BorderFactory.createEtchedBorder());
 
 		playerPanel = new MyPlayerPanel();
-		playerPanel.playerBoard = player;
+		playerPanel.playerPath = player;
 		playerPanel.setBounds(20, 20, 400, 400);
 
 		// JButton
@@ -131,10 +130,7 @@ class MyGUI implements ActionListener {
 
 	}
 	
-	public void addKeyListener(KeyListener k) {
-		drawingPanel.addKeyListener(k);
-	}
-
+	
 	public void addMouseListener(MouseListener m) {
 		drawingPanel.addMouseListener(m);
 	}
@@ -190,7 +186,7 @@ class MyGUI implements ActionListener {
 		 */
 		private static final long serialVersionUID = 1L;
 		// LOCAL ARRAY OF IMAGES
-		Boolean[][] playerBoard;
+		Boolean[][] playerPath;
 		BufferedImage playerImg;
 
 		public MyPlayerPanel(){
@@ -198,7 +194,7 @@ class MyGUI implements ActionListener {
 		}
 		// how we get the outside array to the inside
 		public void setPlayerArray(Boolean[][] input) {
-			playerBoard = input;
+			playerPath = input;
 		}
 
 		public void setPlayer(BufferedImage input) {
@@ -212,7 +208,7 @@ class MyGUI implements ActionListener {
 
 			for (int row = 0; row < 10; row++) {
 				for (int col = 0; col < 10; col++) {
-					if(playerBoard[row][col])
+					if(playerPath[row][col])
 						g.drawImage(playerImg, col * 40, row * 40, 40, 40, null);
 				}
 
