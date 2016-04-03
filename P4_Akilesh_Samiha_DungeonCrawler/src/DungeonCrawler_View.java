@@ -20,6 +20,7 @@ public class DungeonCrawler_View {
 
 	BufferedImage[][] gameBoard;
 	Boolean[][] playerBoard;
+	Boolean[][] monsterBoard;
 
 	MyGUI gui;
 
@@ -28,8 +29,9 @@ public class DungeonCrawler_View {
 		// DEBUG
 		gameBoard = new BufferedImage[10][10];
 		playerBoard = new Boolean[10][10];
+		monsterBoard = new Boolean[10][10];
 
-		gui = new MyGUI(gameBoard, playerBoard);
+		gui = new MyGUI(gameBoard, playerBoard, monsterBoard);
 
 		// use this method whenever an updated gameBoard needs to be given.
 		gui.drawingPanel.giveOuterArray(gameBoard);
@@ -51,6 +53,7 @@ class MyGUI implements ActionListener {
 	Color color = Color.RED;
 	MyDrawingPanel drawingPanel;
 	MyPlayerPanel playerPanel;
+	MyMonsterPanel monsterPanel;
 	JFrame window;
 	int count = 0;
 
@@ -63,7 +66,7 @@ class MyGUI implements ActionListener {
 	 */
 	Color[][] saveState = new Color[20][20];
 
-	MyGUI(BufferedImage[][] input, Boolean[][] player) {
+	MyGUI(BufferedImage[][] input, Boolean[][] player, Boolean[][] monster) {
 
 		// Create Java Window
 		window = new JFrame("DungeonCrawler");
@@ -99,6 +102,10 @@ class MyGUI implements ActionListener {
 		playerPanel = new MyPlayerPanel();
 		playerPanel.playerPath = player;
 		playerPanel.setBounds(20, 20, 400, 400);
+		
+		monsterPanel = new MyMonsterPanel();
+		monsterPanel.monsterPath = monster;
+		monsterPanel.setBounds(20, 20, 400, 400);
 
 		// JButton
 		JButton button = new JButton("Reset");
@@ -131,6 +138,7 @@ class MyGUI implements ActionListener {
 
 		mainPanel.add(drawingPanel);
 		mainPanel.add(playerPanel);
+		mainPanel.add(monsterPanel);
 		mainPanel.add(flavorPanel);
 		mainPanel.add(flavorPanel2);
 		
@@ -204,12 +212,16 @@ class MyGUI implements ActionListener {
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
+		/**
+		 * 
+		 */
+
 		// LOCAL ARRAY OF IMAGES
 		Boolean[][] playerPath;
 		BufferedImage playerImg;
 
 		public MyPlayerPanel() {
-			// setPlayerArray();
+			playerPath = new Boolean[10][10];
 		}
 
 		// how we get the outside array to the inside
@@ -230,6 +242,50 @@ class MyGUI implements ActionListener {
 				for (int col = 0; col < 10; col++) {
 					if (playerPath[row][col])
 						g.drawImage(playerImg, col * 40, row * 40, 40, 40, null);
+				}
+
+			}
+
+		}
+	}
+	
+	class MyMonsterPanel extends JPanel {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		// LOCAL ARRAY OF IMAGES
+		Boolean[][] monsterPath;
+		BufferedImage monsterImg;
+
+		public MyMonsterPanel() {
+			monsterPath  = new  Boolean[10][10];
+			for (int i = 0; i < monsterPath.length; i++) {
+				for (int j = 0; j < monsterPath.length; j++) {
+					monsterPath[i][j] = false;
+				}
+			}
+		}
+
+		// how we get the outside array to the inside
+		public void setMonsterArray(Boolean[][] input) {
+			monsterPath = input;
+		}
+
+		public void setMonster(BufferedImage input) {
+			monsterImg = input;
+		}
+
+		public void paintComponent(Graphics g) {
+
+			// This is what repaint calls, so we place the drawImg and stuff
+			// here.
+
+			for (int row = 0; row < 10; row++) {
+				for (int col = 0; col < 10; col++) {
+					if (monsterPath[row][col])
+						g.drawImage(monsterImg, col * 40, row * 40, 40, 40, null);
 				}
 
 			}
