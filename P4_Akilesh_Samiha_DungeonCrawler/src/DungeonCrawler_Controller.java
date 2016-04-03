@@ -3,6 +3,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 import javax.swing.Timer;
 
@@ -19,82 +20,89 @@ public class DungeonCrawler_Controller {
 		view.gui.window.addKeyListener(new MyKeyAdapter());
 		setup();
 		time = new Timer(500, null);
-		time.addActionListener(new ActionListener(){
+		time.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				moveMonster();
 			}
-			
+
 		});
 	}
 
-	public void moveMonster(){
-		model.enemy.setMonsterImg("enemy_sprite_down.png");
+	public void moveMonster() {
+		int[] v = { 0, 0, -1, 1 };
+		int[] h = { -1, 1, 0, 0 };
+		String[] img = { "enemy_sprite_left.png", "enemy_sprite_right.png", "enemy_sprite_up.png",
+				"enemy_sprite_down.png" };
 		int[] pos = model.getMonsterPos();
-		if (pos[0] + 1 < model.gameBoard.length && model.gameBoard[pos[0] + 1][pos[1]].isWalkable()) {
-			model.setMonsterPath(pos[0] + 1, pos[1], true);
-			model.setMonsterPath(pos[0], pos[1], false);
+		Random r = new Random();
+		int index = r.nextInt(v.length);
+
+		while (!canWalk(pos,v[index], h[index])) {
+			index = r.nextInt(v.length);
 		}
+		model.enemy.setMonsterImg(img[index]);	
+		model.setMonsterPath(pos[0] + v[index], pos[1] + h[index], true);
+		model.setMonsterPath(pos[0], pos[1], false);
+		
 		repaint();
 	}
-	
-	public void play() {		
+
+	public boolean canWalk(int[] pos, int v, int h) {
+		int vertical = pos[0] + v;
+		int horizontal = pos[1] + h;
+		return vertical >= 0 && vertical < model.gameBoard.length && horizontal >= 0
+				&& horizontal < model.gameBoard[0].length && model.gameBoard[vertical][horizontal].isWalkable();
+	}
+
+	public void repaintMonster() {
+		view.gui.monsterPanel.setMonsterArray(model.getMonsterPath());
+		view.gui.monsterPanel.setMonster(model.enemy.getMonsterImg());
+		System.out.println(model.enemy.getMonsterImg());
+		view.gui.monsterPanel.repaint();
+	}
+
+	public void play() {
 		System.out.println("Play Game");
 		if (model.student.getMyHealth() == 0) {
 			view.gui.printLosingMessage();
 		}
 		time.start();
 	}
-	
-	public void repaint(){
+
+	public void repaint() {
 		view.gui.drawingPanel.giveOuterArray(view.getGameBoard());
 		view.gui.drawingPanel.repaint();
-		
+
 		view.gui.playerPanel.setPlayer(model.student.getPlayerImg());
 		view.gui.playerPanel.setPlayerArray(model.getPlayerPath());
 		view.gui.playerPanel.repaint();
+		repaintMonster();
+	}
 
-		view.gui.monsterPanel.setMonsterArray(model.getMonsterPath());
-		System.out.println(model.enemy.getMonsterImg());
-		view.gui.monsterPanel.setMonster(model.enemy.getMonsterImg());
-		view.gui.monsterPanel.repaint();	
-	}
-	
-	public void printArray(Boolean [][] b){
-		for (int i = 0; i < b.length; i++) {
-			for (int j = 0; j < b.length; j++) {
-				System.out.print(b[i][j]+  " ");
-			}
-			System.out.println();
-		}
-		System.out.println();
-	}
-	
 	public void nextLevel() {
 		numLevel++;
 		BufferedImage[][] level = model.loadLevel(numLevel);
 		setInitialPosition();
 		model.resetPlayerPath();
 		model.resetMonsterPath();
-		
+
 		view.setGameBoard(level);
-		
-		repaint();			
+		repaint();
 	}
 
-	
-	public void setInitialPosition(){
-		if (numLevel % 2 == 1){
+	public void setInitialPosition() {
+		if (numLevel % 2 == 1) {
 			model.student.setPlayerImg("player_sprite_up.png");
 			model.enemy.setMonsterImg("enemy_sprite_down.png");
-		} else{
+		} else {
 			model.student.setPlayerImg("player_sprite_right.png");
 			model.enemy.setMonsterImg("enemy_sprite_down.png");
 		}
 	}
-	
+
 	public void setup() {
 		String name = "Sally"; // Replace with user input later
 		model.student.setPlayerImg("player_sprite_up.png");
@@ -114,7 +122,7 @@ public class DungeonCrawler_Controller {
 			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 				model.student.setPlayerImg("player_sprite_down.png");
 				int[] pos = model.getPlayerPos();
-				if (pos[0] + 1 < model.gameBoard.length && model.gameBoard[pos[0] + 1][pos[1]].isWalkable()) {
+				if (canWalk(pos,1,0)) {
 					model.setPlayerPath(pos[0] + 1, pos[1], true);
 					model.setPlayerPath(pos[0], pos[1], false);
 				}
@@ -122,7 +130,7 @@ public class DungeonCrawler_Controller {
 			if (e.getKeyCode() == KeyEvent.VK_UP) {
 				model.student.setPlayerImg("player_sprite_up.png");
 				int[] pos = model.getPlayerPos();
-				if (pos[0] - 1 < model.gameBoard.length && model.gameBoard[pos[0] - 1][pos[1]].isWalkable()) {
+				if (canWalk(pos,-1,0)) {
 					model.setPlayerPath(pos[0] - 1, pos[1], true);
 					model.setPlayerPath(pos[0], pos[1], false);
 				}
@@ -130,7 +138,7 @@ public class DungeonCrawler_Controller {
 			if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 				model.student.setPlayerImg("player_sprite_right.png");
 				int[] pos = model.getPlayerPos();
-				if (pos[1] + 1 < model.gameBoard.length && model.gameBoard[pos[0]][pos[1] + 1].isWalkable()) {
+				if (canWalk(pos,0,1)) {
 					model.setPlayerPath(pos[0], pos[1] + 1, true);
 					model.setPlayerPath(pos[0], pos[1], false);
 				}
@@ -138,7 +146,7 @@ public class DungeonCrawler_Controller {
 			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 				model.student.setPlayerImg("player_sprite_left.png");
 				int[] pos = model.getPlayerPos();
-				if (pos[1] - 1 >= 0 && model.gameBoard[pos[0]][pos[1] - 1].isWalkable()) {
+				if (canWalk(pos,0,-1)) {
 					model.setPlayerPath(pos[0], pos[1] - 1, true);
 					model.setPlayerPath(pos[0], pos[1], false);
 				}
