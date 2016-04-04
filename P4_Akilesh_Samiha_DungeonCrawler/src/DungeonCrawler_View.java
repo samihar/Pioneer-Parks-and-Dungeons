@@ -70,7 +70,7 @@ class MyGUI implements ActionListener {
 
 		// Create Java Window
 		window = new JFrame("DungeonCrawler");
-		window.setBounds(100, 100, 445, 600);
+		window.setBounds(100, 100, 450, 600);
 		window.setResizable(false);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -96,16 +96,16 @@ class MyGUI implements ActionListener {
 		drawingPanel = new MyDrawingPanel();
 		drawingPanel.localGameBoard = input;
 
-		drawingPanel.setBounds(20, 20, 400, 400);
+		drawingPanel.setBounds(20, 0, 700, 700);
 		drawingPanel.setBorder(BorderFactory.createEtchedBorder());
 
 		playerPanel = new MyPlayerPanel();
 		playerPanel.playerPath = player;
-		playerPanel.setBounds(20, 20, 400, 400);
+		playerPanel.setBounds(0, 0, 700, 700);
 		
 		monsterPanel = new MyMonsterPanel();
 		monsterPanel.monsterPath = monster;
-		monsterPanel.setBounds(20, 20, 400, 400);
+		monsterPanel.setBounds(0, 20, 700, 700);
 
 		// JButton
 		JButton button = new JButton("Reset");
@@ -151,7 +151,13 @@ class MyGUI implements ActionListener {
 	}
 
 	public void printLosingMessage() {
-		JOptionPane.showInternalMessageDialog(window, "Sorry, you lost.", "Sorry", JOptionPane.PLAIN_MESSAGE);
+		// JOptionPane.showInternalMessageDialog(window, "Sorry, you lost.", "Sorry", JOptionPane.PLAIN_MESSAGE);
+		JFrame losswindow = new JFrame("DungeonCrawler");
+		losswindow.setBounds(200, 200, 150, 100);
+		losswindow.setResizable(false);
+		losswindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		losswindow.add(new JLabel("Sorry, you lost. close to continue."));
+		losswindow.setVisible(true);
 	}
 
 	public void actionPerformed(ActionEvent e) {

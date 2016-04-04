@@ -3,6 +3,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.Random;
 
 import javax.swing.Timer;
@@ -25,10 +26,25 @@ public class DungeonCrawler_Controller {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				moveMonster();
+				// moveMonster();
+				
+				if(checkDeath()) {
+					time.stop();
+				};
+				
 			}
 
 		});
+	}
+	
+	//debug
+	public void pmatrix(Boolean[][] monsterPath) {
+		for (int i = 0; i < monsterPath.length; i++) {
+		    for (int j = 0; j < monsterPath[0].length; j++) {
+		        System.out.print(monsterPath[i][j] + " ");
+		    }
+		    System.out.print("\n");
+		}
 	}
 
 	public void moveMonster() {
@@ -112,10 +128,54 @@ public class DungeonCrawler_Controller {
 		model.student.setName(name);
 		nextLevel();
 	}
+	
+	// KILLS PLAYER IF PLAYER WALKS ON ENEMY
+	public boolean checkDeath() {
+		int row1=-1;
+		int row2=-2;
+		
+		int col1=-3;
+		int col2=-4;
+		
+		
+		for (int row = 0; row < 10; row++) {
+			for (int col = 0; col < 10; col++) {
+				if (model.monsterPath[row][col]){
+					row1=row;
+					col1=col;
+				}
+					
+			}
+
+		}
+		
+		for (int row = 0; row < 10; row++) {
+			for (int col = 0; col < 10; col++) {
+				if (model.playerPath[row][col]){
+					row2=row;
+					col2=col;
+				}
+					
+			}
+
+		}
+		
+		System.out.println("monster: (" + row1 + "," + col1 +  ")");
+		System.out.println("player: (" + row2 + "," + col2 +  ")");
+		
+		if (row1==row2 && col1==col2) {
+			view.gui.printLosingMessage();
+			return true;
+			
+		} else {
+			return false;
+		}
+	}
 
 	private class MyKeyAdapter extends KeyAdapter {
 
 		public void keyReleased(KeyEvent e) {
+			
 			if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 				model.student.setPlayerImg("player_sprite_down.png");
 			}
@@ -155,6 +215,7 @@ public class DungeonCrawler_Controller {
 				nextLevel();
 			}
 			repaint();
+			
 		}
 
 	}

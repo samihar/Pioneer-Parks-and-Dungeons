@@ -150,7 +150,7 @@ public class DungeonCrawler_Model {
 					list.add(tileImg);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					// e.printStackTrace();
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -227,7 +227,7 @@ class Player {
 			this.playerImg = ImageIO.read(new File("img/sprites/" + fileName));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 	}
 	
@@ -268,7 +268,7 @@ class Monster {
 			monsterImg = ImageIO.read(new File("img/sprites/enemy_sprite_down.png"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 	}
 	
