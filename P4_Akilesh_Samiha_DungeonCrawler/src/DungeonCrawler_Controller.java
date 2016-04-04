@@ -190,7 +190,28 @@ public class DungeonCrawler_Controller {
 		setup();
 		play();
 	}
+	private class MyActionListener implements ActionListener {
 
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (e.getActionCommand() != null) {
+				if (e.getActionCommand().equals("New Game")) {
+					time.stop();
+					restartGame();
+				}
+				if (e.getActionCommand().equals("Exit")) {
+					System.exit(0);
+				}
+				if (e.getActionCommand().equals("How To Play")) {
+					view.gui.showHelp();
+				}
+				if (e.getActionCommand().equals("About")) {
+					view.gui.showAbout();
+				}
+			}
+		}
+
+	}
 	private class MyKeyAdapter extends KeyAdapter {
 
 		public void keyReleased(KeyEvent e) {

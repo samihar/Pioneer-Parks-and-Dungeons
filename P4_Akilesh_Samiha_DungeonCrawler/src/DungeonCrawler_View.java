@@ -1,12 +1,17 @@
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -14,6 +19,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class DungeonCrawler_View {
 	// testing
@@ -159,7 +165,39 @@ class MyGUI implements ActionListener {
 		JOptionPane.showMessageDialog(window, "You ran into the monster. Your health is down to " + health + "!" , "Caught",
 				JOptionPane.WARNING_MESSAGE);
 	}
+	
+	public void showHelp() {
+		JEditorPane helpContent;
+		try {
+			helpContent = new JEditorPane(new URL("file:HowToPlay.html"));
+			JScrollPane helpPane = new JScrollPane(helpContent);
+			helpPane.setPreferredSize(new Dimension(600, 600));
+			JOptionPane.showMessageDialog(null, helpPane, "How To Play", JOptionPane.PLAIN_MESSAGE, null);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
+	public void showAbout() {
+		JEditorPane helpContent;
+		try {
+			helpContent = new JEditorPane(new URL("file:About.html"));
+			JScrollPane helpPane = new JScrollPane(helpContent);
+			helpPane.setPreferredSize(new Dimension(200, 150));
+			JOptionPane.showMessageDialog(null, helpPane, "About", JOptionPane.PLAIN_MESSAGE, null);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public boolean playAgain() {
 		int response = JOptionPane.showInternalOptionDialog(window, "Want to  play again?", "Play Again?",
 				JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
