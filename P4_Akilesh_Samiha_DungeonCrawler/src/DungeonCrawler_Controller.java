@@ -13,11 +13,13 @@ public class DungeonCrawler_Controller {
 	DungeonCrawler_View view;
 	int numLevel;
 	Timer time;
+	boolean lost;
 
 	public DungeonCrawler_Controller() {
 		model = new DungeonCrawler_Model();
 		view = new DungeonCrawler_View();
 		numLevel = 0;
+		lost = false;
 		view.gui.window.addKeyListener(new MyKeyAdapter());
 		setup();
 		time = new Timer(500, null);
@@ -26,43 +28,39 @@ public class DungeonCrawler_Controller {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				// moveMonster();
-				
-				if(checkDeath()) {
-					time.stop();
-				};
-				
+				moveMonster();
+
 			}
 
 		});
 	}
-	
-	//debug
+
+	// debug
 	public void pmatrix(Boolean[][] monsterPath) {
 		for (int i = 0; i < monsterPath.length; i++) {
-		    for (int j = 0; j < monsterPath[0].length; j++) {
-		        System.out.print(monsterPath[i][j] + " ");
-		    }
-		    System.out.print("\n");
+			for (int j = 0; j < monsterPath[0].length; j++) {
+				System.out.print(monsterPath[i][j] + " ");
+			}
+			System.out.print("\n");
 		}
 	}
 
 	public void moveMonster() {
 		int[] v = { 0, 0, -1, 1 };
 		int[] h = { -1, 1, 0, 0 };
-		String[] img = { "enemy_sprite_left.png", "enemy_sprite_right.png", "enemy_sprite_up.png",
+		String[] img = { "enemy_sprite_down.png", "enemy_sprite_down.png", "enemy_sprite_up.png",
 				"enemy_sprite_down.png" };
 		int[] pos = model.getMonsterPos();
 		Random r = new Random();
 		int index = r.nextInt(v.length);
 
-		while (!canWalk(pos,v[index], h[index])) {
+		while (!canWalk(pos, v[index], h[index])) {
 			index = r.nextInt(v.length);
 		}
-		model.enemy.setMonsterImg(img[index]);	
+		model.enemy.setMonsterImg(img[index]);
 		model.setMonsterPath(pos[0] + v[index], pos[1] + h[index], true);
 		model.setMonsterPath(pos[0], pos[1], false);
-		
+
 		repaint();
 	}
 
@@ -82,9 +80,6 @@ public class DungeonCrawler_Controller {
 
 	public void play() {
 		System.out.println("Play Game");
-		if (model.student.getMyHealth() == 0) {
-			view.gui.printLosingMessage();
-		}
 		time.start();
 	}
 
@@ -96,6 +91,8 @@ public class DungeonCrawler_Controller {
 		view.gui.playerPanel.setPlayerArray(model.getPlayerPath());
 		view.gui.playerPanel.repaint();
 		repaintMonster();
+		checkDeath();
+
 	}
 
 	public void nextLevel() {
@@ -128,61 +125,83 @@ public class DungeonCrawler_Controller {
 		model.student.setName(name);
 		nextLevel();
 	}
-	
+
 	// KILLS PLAYER IF PLAYER WALKS ON ENEMY
-	public boolean checkDeath() {
-		int row1=-1;
-		int row2=-2;
-		
-		int col1=-3;
-		int col2=-4;
-		
-		
+	public void checkDeath() {
+		int row1 = -1;
+		int row2 = -2;
+
+		int col1 = -3;
+		int col2 = -4;
+
 		for (int row = 0; row < 10; row++) {
 			for (int col = 0; col < 10; col++) {
-				if (model.monsterPath[row][col]){
-					row1=row;
-					col1=col;
+				if (model.monsterPath[row][col]) {
+					row1 = row;
+					col1 = col;
 				}
-					
+
 			}
 
 		}
-		
+
 		for (int row = 0; row < 10; row++) {
 			for (int col = 0; col < 10; col++) {
-				if (model.playerPath[row][col]){
-					row2=row;
-					col2=col;
+				if (model.playerPath[row][col]) {
+					row2 = row;
+					col2 = col;
 				}
-					
+
 			}
 
 		}
-		
-		System.out.println("monster: (" + row1 + "," + col1 +  ")");
-		System.out.println("player: (" + row2 + "," + col2 +  ")");
-		
-		if (row1==row2 && col1==col2) {
-			view.gui.printLosingMessage();
-			return true;
-			
+
+		System.out.println("monster: (" + row1 + "," + col1 + ")");
+		System.out.println("player: (" + row2 + "," + col2 + ")");
+
+		if (row1 == row2 && col1 == col2) {
+			model.student.setMyHealth(model.student.getMyHealth() - 1);
+			checkHealth();
+		}
+	}
+
+	public void lose() {
+		time.stop();
+		view.gui.printLosingMessage();
+		if (view.gui.playAgain()) {
+			restartGame();
 		} else {
-			return false;
+			System.exit(0);
 		}
+	}
+
+	public void checkHealth() {
+		if (model.student.getMyHealth() <= 0) {
+			lose();
+		} else {
+			view.gui.printWarningMessage(model.student.getMyHealth());
+		}
+
+	}
+
+	public void restartGame() {
+		numLevel = 0;
+		model.student.setMyHealth(3);
+		setup();
+		play();
 	}
 
 	private class MyKeyAdapter extends KeyAdapter {
 
 		public void keyReleased(KeyEvent e) {
-			
+
 			if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 				model.student.setPlayerImg("player_sprite_down.png");
 			}
 			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 				model.student.setPlayerImg("player_sprite_down.png");
 				int[] pos = model.getPlayerPos();
-				if (canWalk(pos,1,0)) {
+				if (canWalk(pos, 1, 0)) {
 					model.setPlayerPath(pos[0] + 1, pos[1], true);
 					model.setPlayerPath(pos[0], pos[1], false);
 				}
@@ -190,7 +209,7 @@ public class DungeonCrawler_Controller {
 			if (e.getKeyCode() == KeyEvent.VK_UP) {
 				model.student.setPlayerImg("player_sprite_up.png");
 				int[] pos = model.getPlayerPos();
-				if (canWalk(pos,-1,0)) {
+				if (canWalk(pos, -1, 0)) {
 					model.setPlayerPath(pos[0] - 1, pos[1], true);
 					model.setPlayerPath(pos[0], pos[1], false);
 				}
@@ -198,7 +217,7 @@ public class DungeonCrawler_Controller {
 			if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 				model.student.setPlayerImg("player_sprite_right.png");
 				int[] pos = model.getPlayerPos();
-				if (canWalk(pos,0,1)) {
+				if (canWalk(pos, 0, 1)) {
 					model.setPlayerPath(pos[0], pos[1] + 1, true);
 					model.setPlayerPath(pos[0], pos[1], false);
 				}
@@ -206,7 +225,7 @@ public class DungeonCrawler_Controller {
 			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 				model.student.setPlayerImg("player_sprite_left.png");
 				int[] pos = model.getPlayerPos();
-				if (canWalk(pos,0,-1)) {
+				if (canWalk(pos, 0, -1)) {
 					model.setPlayerPath(pos[0], pos[1] - 1, true);
 					model.setPlayerPath(pos[0], pos[1], false);
 				}
@@ -214,8 +233,8 @@ public class DungeonCrawler_Controller {
 			if (model.atStairs()) {
 				nextLevel();
 			}
+
 			repaint();
-			
 		}
 
 	}

@@ -212,7 +212,7 @@ class Player {
 	String name;
 
 	public Player() {
-		myHealth = 10;
+		myHealth = 3;
 		myLatePasses = 0;
 		name = "Bob";
 		setPlayerImg("player_sprite_up.png");

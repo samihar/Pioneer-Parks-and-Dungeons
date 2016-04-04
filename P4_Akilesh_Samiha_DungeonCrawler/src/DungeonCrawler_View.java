@@ -70,7 +70,7 @@ class MyGUI implements ActionListener {
 
 		// Create Java Window
 		window = new JFrame("DungeonCrawler");
-		window.setBounds(100, 100, 450, 600);
+		window.setBounds(100, 100, 445, 600);
 		window.setResizable(false);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -96,16 +96,16 @@ class MyGUI implements ActionListener {
 		drawingPanel = new MyDrawingPanel();
 		drawingPanel.localGameBoard = input;
 
-		drawingPanel.setBounds(20, 0, 700, 700);
+		drawingPanel.setBounds(20, 20, 400, 400);
 		drawingPanel.setBorder(BorderFactory.createEtchedBorder());
 
 		playerPanel = new MyPlayerPanel();
 		playerPanel.playerPath = player;
-		playerPanel.setBounds(0, 0, 700, 700);
-		
+		playerPanel.setBounds(20, 20, 400, 400);
+
 		monsterPanel = new MyMonsterPanel();
 		monsterPanel.monsterPath = monster;
-		monsterPanel.setBounds(0, 20, 700, 700);
+		monsterPanel.setBounds(20, 20, 400, 400);
 
 		// JButton
 		JButton button = new JButton("Reset");
@@ -141,7 +141,7 @@ class MyGUI implements ActionListener {
 		mainPanel.add(monsterPanel);
 		mainPanel.add(flavorPanel);
 		mainPanel.add(flavorPanel2);
-		
+
 		window.setJMenuBar(menubar);
 		window.getContentPane().add(mainPanel);
 
@@ -151,15 +151,24 @@ class MyGUI implements ActionListener {
 	}
 
 	public void printLosingMessage() {
-		// JOptionPane.showInternalMessageDialog(window, "Sorry, you lost.", "Sorry", JOptionPane.PLAIN_MESSAGE);
-		JFrame losswindow = new JFrame("DungeonCrawler");
-		losswindow.setBounds(200, 200, 150, 100);
-		losswindow.setResizable(false);
-		losswindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		losswindow.add(new JLabel("Sorry, you lost. close to continue."));
-		losswindow.setVisible(true);
+		JOptionPane.showMessageDialog(window, "Sorry, you lost. close to continue.", "Sorry",
+				JOptionPane.PLAIN_MESSAGE);
+	}
+	
+	public void printWarningMessage(int health) {
+		JOptionPane.showMessageDialog(window, "You ran into the monster. Your health is down to " + health + "!" , "Caught",
+				JOptionPane.WARNING_MESSAGE);
 	}
 
+	public boolean playAgain() {
+		int response = JOptionPane.showInternalOptionDialog(window, "Want to  play again?", "Play Again?",
+				JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+		if (response == JOptionPane.YES_OPTION) {
+			return true;
+		} else
+			return false;
+	}
+	
 	public void actionPerformed(ActionEvent e) {
 
 	}
@@ -254,7 +263,7 @@ class MyGUI implements ActionListener {
 
 		}
 	}
-	
+
 	class MyMonsterPanel extends JPanel {
 
 		/**
@@ -266,7 +275,7 @@ class MyGUI implements ActionListener {
 		BufferedImage monsterImg;
 
 		public MyMonsterPanel() {
-			monsterPath  = new  Boolean[10][10];
+			monsterPath = new Boolean[10][10];
 			for (int i = 0; i < monsterPath.length; i++) {
 				for (int j = 0; j < monsterPath.length; j++) {
 					monsterPath[i][j] = false;
