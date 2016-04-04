@@ -26,7 +26,7 @@ public class DungeonCrawler_Controller {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				// moveMonster();
+			 moveMonster();
 				
 				if(checkDeath()) {
 					time.stop();
