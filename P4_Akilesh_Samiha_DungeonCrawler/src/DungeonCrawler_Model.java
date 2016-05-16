@@ -11,17 +11,26 @@ public class DungeonCrawler_Model {
 	Player student;
 	Monster enemy;
 	int numLevel;
-	Boolean  [][]  playerPath;
-	Boolean [][] monsterPath;
-	static final int[] INITIAL_POSITION_LEVEL_1P = {8,4};
-	static final int[] INITIAL_POSITION_LEVEL_2P = {1,0};
-	static final int[] MONSTER_POSITION_LEVEL_1 = {2,4};
-	static final int[] MONSTER_POSITION_LEVEL_2 = {7,0};
+	Boolean[][] playerPath;
+	Boolean[][] monsterPath;
+	static final int[] INITIAL_POSITION_LEVEL_1P = { 8, 4 };
+	static final int[] INITIAL_POSITION_LEVEL_2P = { 1, 0 };
+	static final int[] INITIAL_POSITION_LEVEL_3P = { 9, 4 };
+	static final int[] MONSTER_POSITION_LEVEL_1 = { 2, 4 };
+	static final int[] MONSTER_POSITION_LEVEL_2 = { 7, 1 };
+	static final int[] MONSTER_POSITION_LEVEL_3 = { 3, 3 };
 	public Tile[][] gameBoard = new Tile[10][10];
-	static final int[] STAIR_POSITION_LEVEL_1_1 = {0,4};
-	static final int[] STAIR_POSITION_LEVEL_1_2 = {0,5};
-	static final int[] STAIR_POSITION_LEVEL_2 = {1,9};
-	
+	static final int[] STAIR_POSITION_LEVEL_1_1 = { 0, 4 };
+	static final int[] STAIR_POSITION_LEVEL_1_2 = { 0, 5 };
+	static final int[] STAIR_POSITION_LEVEL_2 = { 1, 9 };
+	static final int[] STAIR_POSITION_LEVEL_3_1 = { 0, 4 };
+	static final int[] STAIR_POSITION_LEVEL_3_2 = { 0, 5 };
+	static final int[][] LEVEL_1_PASSES = { { 1, 8 },{3,4}, { 4, 1 } };
+
+	static final int[][] LEVEL_2_PASSES = { {2,7},{ 7, 5 }, { 8, 2 } };
+
+	static final int[][] LEVEL_3_PASSES = { {1,8},{4,4},{ 3,6 }};
+
 	public DungeonCrawler_Model() {
 		numLevel = 0;
 		student = new Player();
@@ -30,92 +39,121 @@ public class DungeonCrawler_Model {
 		enemy = new Monster("enemy_sprite_down.png");
 		resetPlayerPath();
 	}
-	
-	public int[] getPlayerPos(){
+
+	public ArrayList<int[]> getPasses(int level) {
+		ArrayList<int[]> passes = new ArrayList<int[]>();
+		if (level % 3 == 1) {
+			for (int[] i : LEVEL_1_PASSES) {
+				passes.add(i);
+			}
+		} else if (level % 3 == 2) {
+			for (int[] i : LEVEL_2_PASSES) {
+				passes.add(i);
+			}
+		}else if (level % 3 == 0) {
+			for (int[] i : LEVEL_3_PASSES) {
+				passes.add(i);
+			}
+		}
+		return passes;
+	}
+
+	public int[] getPlayerPos() {
 		for (int i = 0; i < playerPath.length; i++) {
 			for (int j = 0; j < playerPath.length; j++) {
-				if (playerPath[i][j]){
-					int[] pos = {i,j};
+				if (playerPath[i][j]) {
+					int[] pos = { i, j };
 					return pos;
 				}
 			}
 		}
-		int[] pos = {-1,-1};
+		int[] pos = { -1, -1 };
 		return pos;
 	}
-	
-	public int[] getMonsterPos(){
+
+	public int[] getMonsterPos() {
 		for (int i = 0; i < monsterPath.length; i++) {
 			for (int j = 0; j < monsterPath.length; j++) {
-				if (monsterPath[i][j]){
-					int[] pos = {i,j};
+				if (monsterPath[i][j]) {
+					int[] pos = { i, j };
 					return pos;
 				}
 			}
 		}
-		int[] pos = {-1,-1};
+		int[] pos = { -1, -1 };
 		return pos;
 	}
-	
-	public boolean atStairs(){
-		int[] pos  = getPlayerPos();
-		if (numLevel %  2 == 1)
-			return (pos[0] == STAIR_POSITION_LEVEL_1_1[0] &&  pos[1] == STAIR_POSITION_LEVEL_1_1[1])||
-					(pos[0] == STAIR_POSITION_LEVEL_1_2[0] &&  pos[1] == STAIR_POSITION_LEVEL_1_2[1]);
-		else if (numLevel % 2 == 0) {
-			return pos[0] == STAIR_POSITION_LEVEL_2[0] &&  pos[1] == STAIR_POSITION_LEVEL_2[1];
+
+	public boolean atStairs(boolean forMonster) {
+		int[] pos = getPlayerPos();
+		if (forMonster){
+			pos = getMonsterPos();
 		}
-		 return false;
+		if (numLevel % 3 == 1)
+			return (pos[0] == STAIR_POSITION_LEVEL_1_1[0] && pos[1] == STAIR_POSITION_LEVEL_1_1[1])
+					|| (pos[0] == STAIR_POSITION_LEVEL_1_2[0] && pos[1] == STAIR_POSITION_LEVEL_1_2[1]);
+		else if (numLevel % 3 == 2) {
+			return pos[0] == STAIR_POSITION_LEVEL_2[0] && pos[1] == STAIR_POSITION_LEVEL_2[1];
+		}else if (numLevel % 3 == 0) {
+			return (pos[0] == STAIR_POSITION_LEVEL_3_1[0] && pos[1] == STAIR_POSITION_LEVEL_3_1[1])
+					|| (pos[0] == STAIR_POSITION_LEVEL_3_2[0] && pos[1] == STAIR_POSITION_LEVEL_3_2[1]);
+		}
+		return false;
 	}
-	
-	public void resetMonsterPath(){
+
+	public void resetMonsterPath() {
 		for (int i = 0; i < monsterPath.length; i++) {
 			for (int j = 0; j < monsterPath[0].length; j++) {
 				this.monsterPath[i][j] = false;
 			}
 		}
-		if (numLevel %  2 == 1)
+		if (numLevel % 3 == 1)
 			setMonsterPath(MONSTER_POSITION_LEVEL_1[0], MONSTER_POSITION_LEVEL_1[1], true);
-		else if (numLevel % 2 == 0) {
+		else if (numLevel % 3 == 2) {
 			setMonsterPath(MONSTER_POSITION_LEVEL_2[0], MONSTER_POSITION_LEVEL_2[1], true);
+		}else if (numLevel % 3 == 0) {
+			setMonsterPath(MONSTER_POSITION_LEVEL_3[0], MONSTER_POSITION_LEVEL_3[1], true);
 		}
-		
+
+
 	}
-	
-	public void resetPlayerPath(){
+
+	public void resetPlayerPath() {
 		for (int i = 0; i < playerPath.length; i++) {
 			for (int j = 0; j < playerPath[0].length; j++) {
 				this.playerPath[i][j] = false;
 			}
 		}
-		if (numLevel %  2 == 1)
+		if (numLevel % 3 == 1)
 			setPlayerPath(INITIAL_POSITION_LEVEL_1P[0], INITIAL_POSITION_LEVEL_1P[1], true);
-		else if (numLevel % 2 == 0) {
+		else if (numLevel % 3 == 2) {
 			setPlayerPath(INITIAL_POSITION_LEVEL_2P[0], INITIAL_POSITION_LEVEL_2P[1], true);
+		}else if (numLevel % 3 == 0) {
+			setPlayerPath(INITIAL_POSITION_LEVEL_3P[0], INITIAL_POSITION_LEVEL_3P[1], true);
 		}
-		
+
 	}
 
-	public void setMonsterPath(int  i, int j, boolean hasMonster) {
+	public void setMonsterPath(int i, int j, boolean hasMonster) {
 		this.monsterPath[i][j] = hasMonster;
 	}
-	
-	public void setPlayerPath(int  i, int j, boolean hasPlayer) {
+
+	public void setPlayerPath(int i, int j, boolean hasPlayer) {
 		this.playerPath[i][j] = hasPlayer;
 	}
-	
+
 	// MOVING PLAYER (UP/LEFT/DOWN/RIGHT)
 	public void moveRight(int currI, int currJ) {
 		// Remove player from current spot
-		if ( gameBoard[currI+1][currJ].isWalkable() ) {
-			
+		if (gameBoard[currI + 1][currJ].isWalkable()) {
+
 		}
 	}
 
 	public Boolean[][] getPlayerPath() {
 		return playerPath;
 	}
-	
+
 	public Boolean[][] getMonsterPath() {
 		return monsterPath;
 	}
@@ -124,14 +162,17 @@ public class DungeonCrawler_Model {
 		numLevel = numLev;
 		BufferedImage[][] level = new BufferedImage[10][10];
 		ArrayList<BufferedImage> list = new ArrayList<BufferedImage>();
-		
+
 		ArrayList<Tile> tileStorage = new ArrayList<Tile>();
 		try {
 			Scanner in = null;
-			if (numLevel %  2 == 1)
+			if (numLevel % 3 == 1)
 				in = new Scanner(new File("levels/level1.txt"));
-			else if (numLevel % 2 == 0) {
+			else if (numLevel % 3 == 2) {
 				in = new Scanner(new File("levels/level2.txt"));
+			} else if (numLevel % 3 == 0) {
+
+				in = new Scanner(new File("levels/level3.txt"));
 			}
 			while (in != null && in.hasNext()) {
 				try {
@@ -142,11 +183,11 @@ public class DungeonCrawler_Model {
 					boolean walkable = false;
 					if (walk.equals("true"))
 						walkable = true;
-					
+
 					Tile t = new Tile(tileImg, walkable);
 					// Add the tile we created to a tileStorage ArrayList
 					tileStorage.add(t);
-					
+
 					list.add(tileImg);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -158,12 +199,12 @@ public class DungeonCrawler_Model {
 			e.printStackTrace();
 		}
 		// ADD IMAGES TO THE BUFFEREDIMAGE ARRAY TO GIVE TO VIEW
+
 		for (int i = 0; i < level.length; i++) {
 			for (int j = 0; j < level[0].length; j++) {
-				level[i][j] = list.remove(0);
+					level[i][j] = list.remove(0);
 			}
 		}
-		System.out.println(tileStorage);
 		// ADD TILES TO GAMEBOARD
 		for (int i = 0; i < gameBoard.length; i++) {
 			for (int j = 0; j < gameBoard[0].length; j++) {
@@ -182,7 +223,7 @@ class Tile {
 		tileImage = img;
 		walkable = walk;
 	}
-	
+
 	public BufferedImage getTileImage() {
 		return tileImage;
 	}
@@ -198,7 +239,8 @@ class Tile {
 	public void setWalkable(boolean walkable) {
 		this.walkable = walkable;
 	}
-	
+
+
 	@Override
 	public String toString() {
 		return "[ " + walkable + " ]";
@@ -230,7 +272,7 @@ class Player {
 			// e.printStackTrace();
 		}
 	}
-	
+
 	public int getMyHealth() {
 		return myHealth;
 	}
@@ -271,7 +313,7 @@ class Monster {
 			// e.printStackTrace();
 		}
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -283,8 +325,8 @@ class Monster {
 	public BufferedImage getMonsterImg() {
 		return monsterImg;
 	}
-	
-	public void setMonsterImg(String fileName){
+
+	public void setMonsterImg(String fileName) {
 		try {
 			monsterImg = ImageIO.read(new File("img/sprites/" + fileName));
 		} catch (IOException e) {

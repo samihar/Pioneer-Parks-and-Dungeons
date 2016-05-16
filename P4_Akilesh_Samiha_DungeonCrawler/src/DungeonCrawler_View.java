@@ -5,12 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -60,13 +62,17 @@ class MyGUI implements ActionListener {
 	MyDrawingPanel drawingPanel;
 	MyPlayerPanel playerPanel;
 	MyMonsterPanel monsterPanel;
+	MyLatePassPanel latepassPanel;
 	JFrame window;
 	int count = 0;
+	int healthCount = 3;
 
 	JLabel devs = new JLabel("S.R. / A.P.");
 
 	JLabel ver = new JLabel("0.5");
+	JLabel health = new JLabel("" + healthCount);
 
+	JLabel latepass = new JLabel("0");
 	/*
 	 * 0 - WHITE 1 - RED 2 - GREEN 3 - BLUE
 	 */
@@ -75,7 +81,7 @@ class MyGUI implements ActionListener {
 	MyGUI(BufferedImage[][] input, Boolean[][] player, Boolean[][] monster) {
 
 		// Create Java Window
-		window = new JFrame("DungeonCrawler");
+		window = new JFrame("Pioneer Parks and Dungeons");
 		window.setBounds(100, 100, 445, 600);
 		window.setResizable(false);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -113,15 +119,8 @@ class MyGUI implements ActionListener {
 		monsterPanel.monsterPath = monster;
 		monsterPanel.setBounds(20, 20, 400, 400);
 
-		// JButton
-		JButton button = new JButton("Reset");
-		button.setBounds(125, 510, 90, 20);
-		button.addActionListener(this);
-
-		// JButton (color)
-		JButton colorButton = new JButton("Custom Color");
-		colorButton.setBounds(230, 510, 90, 20);
-		colorButton.addActionListener(this);
+		latepassPanel = new MyLatePassPanel();
+		latepassPanel.setBounds(20, 20, 400, 400);
 
 		// placeholder for now
 
@@ -131,24 +130,40 @@ class MyGUI implements ActionListener {
 
 		JPanel flavorPanel = new JPanel();
 		flavorPanel.setBorder(BorderFactory.createTitledBorder("Developers"));
-
-		flavorPanel.setBounds(80, 425, 100, 70);
+		flavorPanel.setBounds(0, 500, 80, 45);
 		flavorPanel.add(devs);
 
 		JPanel flavorPanel2 = new JPanel();
 		flavorPanel2.setBorder(BorderFactory.createTitledBorder("Version"));
-		flavorPanel2.setBounds(270, 425, 100, 70);
+		flavorPanel2.setBounds(80, 500, 80, 45);
 		flavorPanel2.add(ver);
+
+		JPanel healthPanel = new JPanel();
+
+		healthPanel.setBorder(BorderFactory.createTitledBorder("Health"));
+		healthPanel.setBounds(100, 425, 75, 50);
+		healthPanel.add(health);
+
+		JPanel latepassCounter = new JPanel();
+
+		latepassCounter.setBorder(BorderFactory.createTitledBorder("Late Passes Collected"));
+		latepassCounter.setBounds(200, 425, 150, 50);
+		latepassCounter.add(latepass);
 
 		// ADD ALL PANELS
 
 		mainPanel.add(drawingPanel);
 		mainPanel.add(playerPanel);
 		mainPanel.add(monsterPanel);
+		mainPanel.add(latepassPanel);
 		mainPanel.add(flavorPanel);
 		mainPanel.add(flavorPanel2);
+		mainPanel.add(healthPanel);
+
+		mainPanel.add(latepassCounter);
 
 		window.setJMenuBar(menubar);
+
 		window.getContentPane().add(mainPanel);
 
 		// Let there be light
@@ -160,12 +175,12 @@ class MyGUI implements ActionListener {
 		JOptionPane.showMessageDialog(window, "Sorry, you lost. close to continue.", "Sorry",
 				JOptionPane.PLAIN_MESSAGE);
 	}
-	
+
 	public void printWarningMessage(int health) {
-		JOptionPane.showMessageDialog(window, "You ran into the monster. Your health is down to " + health + "!" , "Caught",
-				JOptionPane.WARNING_MESSAGE);
+		JOptionPane.showMessageDialog(window, "You ran into the monster. Your health is down to " + health + "!",
+				"Caught", JOptionPane.WARNING_MESSAGE);
 	}
-	
+
 	public void showHelp() {
 		JEditorPane helpContent;
 		try {
@@ -197,7 +212,7 @@ class MyGUI implements ActionListener {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public boolean playAgain() {
 		int response = JOptionPane.showInternalOptionDialog(window, "Want to  play again?", "Play Again?",
 				JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
@@ -206,7 +221,7 @@ class MyGUI implements ActionListener {
 		} else
 			return false;
 	}
-	
+
 	public void actionPerformed(ActionEvent e) {
 
 	}
@@ -293,8 +308,72 @@ class MyGUI implements ActionListener {
 
 			for (int row = 0; row < 10; row++) {
 				for (int col = 0; col < 10; col++) {
-					if (playerPath[row][col])
+					if (playerPath[row][col] != null && playerPath[row][col])
 						g.drawImage(playerImg, col * 40, row * 40, 40, 40, null);
+				}
+
+			}
+
+		}
+	}
+
+	class MyLatePassPanel extends JPanel {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		// LOCAL ARRAY OF IMAGES
+		Boolean[][] passPanel;
+		BufferedImage passImg;
+
+		public MyLatePassPanel() {
+			try {
+				passImg = ImageIO.read(new File("img/latepass.png"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			passPanel = new Boolean[10][10];
+			for (int i = 0; i < passPanel.length; i++) {
+				for (int j = 0; j < passPanel.length; j++) {
+					passPanel[i][j] = false;
+				}
+			}
+		}
+
+		private void reset() {
+			for (int i = 0; i < passPanel.length; i++) {
+				for (int j = 0; j < passPanel.length; j++) {
+					passPanel[i][j] = false;
+				}
+			}
+		}
+
+		public void addPasses(ArrayList<int[]> passes) {
+			reset();
+			while (passes.size() > 0) {
+				int[] pos = passes.remove(0);
+				passPanel[pos[0]][pos[1]] = true;
+			}
+		}
+
+		public boolean deletePasses(int i, int j) {
+			if (passPanel[i][j]) {
+				passPanel[i][j] = false;
+				return true;
+			}
+			return false;
+		}
+
+		public void paintComponent(Graphics g) {
+
+			for (int row = 0; row < 10; row++) {
+
+				for (int col = 0; col < 10; col++) {
+					if (passPanel[row][col] != null && passPanel[row][col])
+						g.drawImage(passImg, col * 40, row * 40, 40, 40, null);
+
 				}
 
 			}
@@ -337,7 +416,7 @@ class MyGUI implements ActionListener {
 
 			for (int row = 0; row < 10; row++) {
 				for (int col = 0; col < 10; col++) {
-					if (monsterPath[row][col])
+					if (monsterPath[row][col] != null && monsterPath[row][col])
 						g.drawImage(monsterImg, col * 40, row * 40, 40, 40, null);
 				}
 

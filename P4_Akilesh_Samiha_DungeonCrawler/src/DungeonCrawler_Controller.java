@@ -12,13 +12,18 @@ public class DungeonCrawler_Controller {
 	DungeonCrawler_Model model;
 	DungeonCrawler_View view;
 	int numLevel;
+	int numLatePasses;
+	int initNumPasses;
 	Timer time;
 	boolean lost;
+	static final boolean DEBUG = false;
 
 	public DungeonCrawler_Controller() {
 		model = new DungeonCrawler_Model();
 		view = new DungeonCrawler_View();
 		numLevel = 0;
+		numLatePasses = 0;
+		initNumPasses = numLatePasses;
 		lost = false;
 		view.gui.window.addKeyListener(new MyKeyAdapter());
 		setup();
@@ -37,11 +42,13 @@ public class DungeonCrawler_Controller {
 
 	// debug
 	public void pmatrix(Boolean[][] monsterPath) {
-		for (int i = 0; i < monsterPath.length; i++) {
-			for (int j = 0; j < monsterPath[0].length; j++) {
-				System.out.print(monsterPath[i][j] + " ");
+		if (DEBUG) {
+			for (int i = 0; i < monsterPath.length; i++) {
+				for (int j = 0; j < monsterPath[0].length; j++) {
+					System.out.print(monsterPath[i][j] + " ");
+				}
+				System.out.print("\n");
 			}
-			System.out.print("\n");
 		}
 	}
 
@@ -74,7 +81,6 @@ public class DungeonCrawler_Controller {
 	public void repaintMonster() {
 		view.gui.monsterPanel.setMonsterArray(model.getMonsterPath());
 		view.gui.monsterPanel.setMonster(model.enemy.getMonsterImg());
-		System.out.println(model.enemy.getMonsterImg());
 		view.gui.monsterPanel.repaint();
 	}
 
@@ -87,31 +93,47 @@ public class DungeonCrawler_Controller {
 		view.gui.drawingPanel.giveOuterArray(view.getGameBoard());
 		view.gui.drawingPanel.repaint();
 
+		view.gui.latepassPanel.repaint();
 		view.gui.playerPanel.setPlayer(model.student.getPlayerImg());
 		view.gui.playerPanel.setPlayerArray(model.getPlayerPath());
 		view.gui.playerPanel.repaint();
 		repaintMonster();
 		checkDeath();
-
+		checkLatepass();
 	}
-
+	
+	public void checkLatepass(){
+		int pos[] = model.getPlayerPos();
+		if (view.gui.latepassPanel.deletePasses(pos[0], pos[1])){
+			System.out.println("Pass!");
+			numLatePasses++;
+			view.gui.latepass.setText(""+numLatePasses);
+			repaint();
+		}
+	}
+	
 	public void nextLevel() {
 		numLevel++;
+		numLatePasses  = initNumPasses;
+		view.gui.latepass.setText(""+numLatePasses);
 		BufferedImage[][] level = model.loadLevel(numLevel);
 		setInitialPosition();
 		model.resetPlayerPath();
 		model.resetMonsterPath();
-
 		view.setGameBoard(level);
+		view.gui.latepassPanel.addPasses(model.getPasses(numLevel));
 		repaint();
 	}
 
 	public void setInitialPosition() {
-		if (numLevel % 2 == 1) {
+		if (numLevel % 3 == 1) {
 			model.student.setPlayerImg("player_sprite_up.png");
 			model.enemy.setMonsterImg("enemy_sprite_down.png");
-		} else {
+		} else if (numLevel % 3 == 2){
 			model.student.setPlayerImg("player_sprite_right.png");
+			model.enemy.setMonsterImg("enemy_sprite_down.png");
+		} else if (numLevel % 3 == 0){
+			model.student.setPlayerImg("player_sprite_up.png");
 			model.enemy.setMonsterImg("enemy_sprite_down.png");
 		}
 	}
@@ -156,12 +178,14 @@ public class DungeonCrawler_Controller {
 
 		}
 
-		System.out.println("monster: (" + row1 + "," + col1 + ")");
-		System.out.println("player: (" + row2 + "," + col2 + ")");
-
 		if (row1 == row2 && col1 == col2) {
 			model.student.setMyHealth(model.student.getMyHealth() - 1);
+			view.gui.health.setText("" + model.student.getMyHealth());
+			time.stop();
 			checkHealth();
+			numLevel--;
+			nextLevel();
+			time.start();
 		}
 	}
 
@@ -190,11 +214,13 @@ public class DungeonCrawler_Controller {
 		setup();
 		play();
 	}
+
 	private class MyActionListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (e.getActionCommand() != null) {
+				System.out.println("Button Pressed : " + e.getActionCommand());
 				if (e.getActionCommand().equals("New Game")) {
 					time.stop();
 					restartGame();
@@ -212,6 +238,7 @@ public class DungeonCrawler_Controller {
 		}
 
 	}
+
 	private class MyKeyAdapter extends KeyAdapter {
 
 		public void keyReleased(KeyEvent e) {
@@ -251,7 +278,8 @@ public class DungeonCrawler_Controller {
 					model.setPlayerPath(pos[0], pos[1], false);
 				}
 			}
-			if (model.atStairs()) {
+			if (model.atStairs(false)) {
+				initNumPasses =  numLatePasses;
 				nextLevel();
 			}
 
