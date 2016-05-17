@@ -24,7 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 public class DungeonCrawler_View {
-	// testing
+
 
 	BufferedImage[][] gameBoard;
 	Boolean[][] playerBoard;
