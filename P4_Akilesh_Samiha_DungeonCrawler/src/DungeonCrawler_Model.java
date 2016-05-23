@@ -88,7 +88,7 @@ public class DungeonCrawler_Model {
 		} else if (percent >= 90) {
 			return "A\nAmazing!!! You were born to program!";
 		} else if (percent >= 80) {
-			return "B\nNice job! A programmer in the works";
+			return "B\nNice job! A programmer in the works!";
 		} else if (percent >= 70) {
 			return "C\nGood job, you passed the class!";
 		} else if (percent >= 60) {
