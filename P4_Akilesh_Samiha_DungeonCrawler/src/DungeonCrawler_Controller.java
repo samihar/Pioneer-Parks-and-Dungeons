@@ -3,9 +3,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.Random;
-
 import javax.swing.Timer;
 
 public class DungeonCrawler_Controller {
@@ -15,17 +13,27 @@ public class DungeonCrawler_Controller {
 	int numLatePasses;
 	int initNumPasses;
 	Timer time;
-	boolean lost;
+	Timer level4Timer;
+	boolean monsterPresent;
+	boolean usbPresent;
 	static final boolean DEBUG = false;
+	static final boolean DEBUG_LEVELS = true;
+	static final int BONUS_TIME = 15;
+	static final int NUM_ASSIGNMENTS = 12;
 
 	public DungeonCrawler_Controller() {
 		model = new DungeonCrawler_Model();
 		view = new DungeonCrawler_View();
 		numLevel = 0;
 		numLatePasses = 0;
+		usbPresent = false;
 		initNumPasses = numLatePasses;
-		lost = false;
+		monsterPresent = true;
 		view.gui.window.addKeyListener(new MyKeyAdapter());
+		view.gui.exit.addActionListener(new MyActionListener());
+		view.gui.newGame.addActionListener(new MyActionListener());
+		view.gui.howToPlay.addActionListener(new MyActionListener());
+		view.gui.about.addActionListener(new MyActionListener());
 		setup();
 		time = new Timer(500, null);
 		time.addActionListener(new ActionListener() {
@@ -33,10 +41,27 @@ public class DungeonCrawler_Controller {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-
-				moveMonster();
+				if (monsterPresent)
+					moveMonster();
 			}
 
+		});
+		level4Timer = new Timer(1000,null);
+		level4Timer.addActionListener(new ActionListener() {
+			int timeCount = 0;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				timeCount++;
+				view.gui.time.setText(""+ (BONUS_TIME - timeCount));
+				if (timeCount == 15){
+					level4Timer.stop();
+					view.gui.bonusTimeUp();
+					initNumPasses  = numLatePasses;
+					nextLevel();
+					timeCount= 0;
+					view.gui.time.setText("N/A");
+				}
+			}
 		});
 	}
 
@@ -78,63 +103,76 @@ public class DungeonCrawler_Controller {
 				&& horizontal < model.gameBoard[0].length && model.gameBoard[vertical][horizontal].isWalkable();
 	}
 
-	public void repaintMonster() {
-		view.gui.monsterPanel.setMonsterArray(model.getMonsterPath());
-		view.gui.monsterPanel.setMonster(model.enemy.getMonsterImg());
-		view.gui.monsterPanel.repaint();
-	}
-
 	public void play() {
-		System.out.println("Play Game");
 		time.start();
 	}
 
+	public boolean checkUSB(){
+		int[] player = model.getPlayerPos();
+		int[] usb = model.getUSB();
+		return usbPresent && player[0] == usb[0] && player[1] == usb[1];
+	}
 	public void repaint() {
-		view.gui.drawingPanel.giveOuterArray(view.getGameBoard());
-		view.gui.drawingPanel.repaint();
-
-		view.gui.latepassPanel.repaint();
-		view.gui.playerPanel.setPlayer(model.student.getPlayerImg());
-		view.gui.playerPanel.setPlayerArray(model.getPlayerPath());
-		view.gui.playerPanel.repaint();
-		repaintMonster();
+		view.gui.gamepanel.drawingPanel.giveOuterArray(view.getGameBoard());
+		view.gui.gamepanel.playerPanel.setPlayer(model.student.getPlayerImg());
+		view.gui.gamepanel.playerPanel.setPlayerArray(model.getPlayerPath());
+		view.gui.gamepanel.monsterPanel.setMonsterArray(model.getMonsterPath());
+		view.gui.gamepanel.monsterPanel.setMonster(model.enemy.getMonsterImg());
+		view.gui.gamepanel.setIsUSBPresent(usbPresent);
+		view.gui.gamepanel.repaint();
 		checkDeath();
 		checkLatepass();
 	}
-	
-	public void checkLatepass(){
+
+	public void checkLatepass() {
 		int pos[] = model.getPlayerPos();
-		if (view.gui.latepassPanel.deletePasses(pos[0], pos[1])){
-			System.out.println("Pass!");
+		if (view.gui.gamepanel.latepassPanel.deletePasses(pos[0], pos[1])) {
 			numLatePasses++;
-			view.gui.latepass.setText(""+numLatePasses);
+			view.gui.latepass.setText("" + numLatePasses);
 			repaint();
 		}
 	}
-	
+
 	public void nextLevel() {
 		numLevel++;
-		numLatePasses  = initNumPasses;
-		view.gui.latepass.setText(""+numLatePasses);
+		if (numLevel > 3){
+			monsterPresent = false;
+		}
+		numLatePasses = initNumPasses;
+		view.gui.latepass.setText("" + numLatePasses);
 		BufferedImage[][] level = model.loadLevel(numLevel);
 		setInitialPosition();
 		model.resetPlayerPath();
 		model.resetMonsterPath();
 		view.setGameBoard(level);
-		view.gui.latepassPanel.addPasses(model.getPasses(numLevel));
+		view.gui.gamepanel.latepassPanel.addPasses(model.getPasses(numLevel));
+		if (numLevel ==5){	
+			view.gui.gamepanel.usb.addUSB(model.getUSB());
+			usbPresent  =  true;
+		}
 		repaint();
+		if (numLevel == 4){
+			view.gui.time.setText(""+BONUS_TIME);
+			repaint();
+			view.gui.postBonus(NUM_ASSIGNMENTS, BONUS_TIME);			
+			level4Timer.start();
+		}
 	}
 
 	public void setInitialPosition() {
-		if (numLevel % 3 == 1) {
+		if (numLevel  == 1) {
 			model.student.setPlayerImg("player_sprite_up.png");
 			model.enemy.setMonsterImg("enemy_sprite_down.png");
-		} else if (numLevel % 3 == 2){
+		} else if (numLevel == 2) {
 			model.student.setPlayerImg("player_sprite_right.png");
 			model.enemy.setMonsterImg("enemy_sprite_down.png");
-		} else if (numLevel % 3 == 0){
+		} else if (numLevel == 3) {
 			model.student.setPlayerImg("player_sprite_up.png");
 			model.enemy.setMonsterImg("enemy_sprite_down.png");
+		} else if (numLevel == 4) {
+			model.student.setPlayerImg("player_sprite_left.png");
+		} else if (numLevel == 5) {
+			model.student.setPlayerImg("player_sprite_right.png");
 		}
 	}
 
@@ -181,6 +219,7 @@ public class DungeonCrawler_Controller {
 		if (row1 == row2 && col1 == col2) {
 			model.student.setMyHealth(model.student.getMyHealth() - 1);
 			view.gui.health.setText("" + model.student.getMyHealth());
+			model.enemy.setMonsterImg("enemy_sprite_up.png");			
 			time.stop();
 			checkHealth();
 			numLevel--;
@@ -199,6 +238,19 @@ public class DungeonCrawler_Controller {
 		}
 	}
 
+	public void end() {
+		time.stop();
+		view.gui.printEndingMessage();
+		double test = view.gui.askTest();
+		String report = model.generateGradeReport(numLatePasses, NUM_ASSIGNMENTS, test);
+		view.gui.printReport(report);
+		if (view.gui.playAgain()) {
+			restartGame();
+		} else {
+			System.exit(0);
+		}
+	}
+
 	public void checkHealth() {
 		if (model.student.getMyHealth() <= 0) {
 			lose();
@@ -210,7 +262,14 @@ public class DungeonCrawler_Controller {
 
 	public void restartGame() {
 		numLevel = 0;
+		usbPresent = false;
+		numLatePasses = 0;
+		initNumPasses = 0;
 		model.student.setMyHealth(3);
+		monsterPresent = true;
+		view.gui.health.setText("" + model.student.getMyHealth());
+		view.gui.latepass.setText("" + numLatePasses);
+		view.gui.time.setText("N/A");
 		setup();
 		play();
 	}
@@ -220,7 +279,6 @@ public class DungeonCrawler_Controller {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (e.getActionCommand() != null) {
-				System.out.println("Button Pressed : " + e.getActionCommand());
 				if (e.getActionCommand().equals("New Game")) {
 					time.stop();
 					restartGame();
@@ -278,12 +336,21 @@ public class DungeonCrawler_Controller {
 					model.setPlayerPath(pos[0], pos[1], false);
 				}
 			}
-			if (model.atStairs(false)) {
-				initNumPasses =  numLatePasses;
-				nextLevel();
+			if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+				if (DEBUG_LEVELS) {
+					nextLevel();
+				}
 			}
 
 			repaint();
+			if (checkUSB()){
+				end();
+			}
+			if (model.atStairs()) {
+				initNumPasses = numLatePasses;
+				nextLevel();
+				repaint();
+			}
 		}
 
 	}

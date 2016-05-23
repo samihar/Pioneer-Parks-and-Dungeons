@@ -16,20 +16,29 @@ public class DungeonCrawler_Model {
 	static final int[] INITIAL_POSITION_LEVEL_1P = { 8, 4 };
 	static final int[] INITIAL_POSITION_LEVEL_2P = { 1, 0 };
 	static final int[] INITIAL_POSITION_LEVEL_3P = { 9, 4 };
+	static final int[] INITIAL_POSITION_LEVEL_4P = { 9, 9 };
+	static final int[] INITIAL_POSITION_LEVEL_5P = { 9, 0 };
+
 	static final int[] MONSTER_POSITION_LEVEL_1 = { 2, 4 };
 	static final int[] MONSTER_POSITION_LEVEL_2 = { 7, 1 };
 	static final int[] MONSTER_POSITION_LEVEL_3 = { 3, 3 };
+	static final int[] MONSTER_POSITION_LEVEL_4 = { 3, 3 };
+
 	public Tile[][] gameBoard = new Tile[10][10];
+
 	static final int[] STAIR_POSITION_LEVEL_1_1 = { 0, 4 };
 	static final int[] STAIR_POSITION_LEVEL_1_2 = { 0, 5 };
 	static final int[] STAIR_POSITION_LEVEL_2 = { 1, 9 };
 	static final int[] STAIR_POSITION_LEVEL_3_1 = { 0, 4 };
 	static final int[] STAIR_POSITION_LEVEL_3_2 = { 0, 5 };
-	static final int[][] LEVEL_1_PASSES = { { 1, 8 },{3,4}, { 4, 1 } };
 
-	static final int[][] LEVEL_2_PASSES = { {2,7},{ 7, 5 }, { 8, 2 } };
+	static final int[][] LEVEL_1_PASSES = { { 1, 8 }, { 3, 4 }, { 4, 1 } };
+	static final int[][] LEVEL_2_PASSES = { { 2, 7 }, { 7, 5 }, { 8, 2 } };
+	static final int[][] LEVEL_3_PASSES = { { 1, 8 }, { 4, 4 }, { 3, 6 } };
+	static final int[][] LEVEL_4_PASSES = { { 1, 8 }, { 3, 8 }, { 5, 8 }, { 7, 8 }, { 1, 9 }, { 3, 9 }, { 5, 9 },
+			{ 7, 9 } };
 
-	static final int[][] LEVEL_3_PASSES = { {1,8},{4,4},{ 3,6 }};
+	static final int[] LEVEL_5_USB = { 4, 4 };
 
 	public DungeonCrawler_Model() {
 		numLevel = 0;
@@ -40,22 +49,88 @@ public class DungeonCrawler_Model {
 		resetPlayerPath();
 	}
 
+	public String generateGradeReport(int numLatePasses, int numHW, double test) {
+		double testPercent = test + 0.0;
+		double hwPercent = 100;
+		double percent = 0;
+		if (numHW >= numLatePasses) {
+			hwPercent *= (double) numLatePasses / (double) numHW;
+		} else {
+			double multiplier = 1 + ((double) (numLatePasses - numHW)) / ((double) numHW * 10.0);
+			hwPercent *= multiplier;
+		}
+		percent = 0.6 * testPercent + 0.4 * hwPercent;
+		String grade = getGrade(percent);
+		
+		String gradeReport = "Your final grade report:\n" + "Tests/Quizzes (60%): " + Math.round(testPercent)+ "%\n"
+				+ "Homework (40%): " + Math.round(hwPercent) + "%\n" + "Score: " + Math.round(percent) + "%\n" + "Grade: " + grade;
+
+		return gradeReport;
+	}
+
+	public double round(double n){
+		double rounded = 0;
+		String roundStr = Double.toString(n);
+		int index = roundStr.indexOf(".");
+		if (index == -1 || index + 2 <= roundStr.length() -1){
+			rounded = n;
+		} else{
+			String part1 = roundStr.substring(0, index);
+			String part2 = roundStr.substring(index + 1, index + 3);
+			roundStr = part1 + part2;
+			rounded = Double.parseDouble(roundStr);
+		}
+		return rounded;
+	}
+	public String getGrade(double percent) {
+		if (percent >= 100) {
+			return "A+\nWOW! You might just be the next CS Based god o.O";
+		} else if (percent >= 90) {
+			return "A\nAmazing!!! You were born to program!";
+		} else if (percent >= 80) {
+			return "B\nNice job! A programmer in the works";
+		} else if (percent >= 70) {
+			return "C\nGood job, you passed the class!";
+		} else if (percent >= 60) {
+			return "D\nI regret to inform you that you did not pass APCS.";
+		} else{
+			return "F\nYou did not pass APCS.";
+		}
+	}
+
 	public ArrayList<int[]> getPasses(int level) {
 		ArrayList<int[]> passes = new ArrayList<int[]>();
-		if (level % 3 == 1) {
+		if (level == 1) {
 			for (int[] i : LEVEL_1_PASSES) {
 				passes.add(i);
 			}
-		} else if (level % 3 == 2) {
+		} else if (level == 2) {
 			for (int[] i : LEVEL_2_PASSES) {
 				passes.add(i);
 			}
-		}else if (level % 3 == 0) {
+		} else if (level == 3) {
 			for (int[] i : LEVEL_3_PASSES) {
+				passes.add(i);
+			}
+		} else if (level == 4) {
+			for (int[] i : LEVEL_4_PASSES) {
 				passes.add(i);
 			}
 		}
 		return passes;
+	}
+
+	public int[] getUSB() {
+		return LEVEL_5_USB;
+	}
+
+	public void removeMonster() {
+		for (int i = 0; i < monsterPath.length; i++) {
+			for (int j = 0; j < monsterPath.length; j++) {
+				monsterPath[i][j] = false;
+
+			}
+		}
 	}
 
 	public int[] getPlayerPos() {
@@ -84,17 +159,14 @@ public class DungeonCrawler_Model {
 		return pos;
 	}
 
-	public boolean atStairs(boolean forMonster) {
+	public boolean atStairs() {
 		int[] pos = getPlayerPos();
-		if (forMonster){
-			pos = getMonsterPos();
-		}
-		if (numLevel % 3 == 1)
+		if (numLevel == 1)
 			return (pos[0] == STAIR_POSITION_LEVEL_1_1[0] && pos[1] == STAIR_POSITION_LEVEL_1_1[1])
 					|| (pos[0] == STAIR_POSITION_LEVEL_1_2[0] && pos[1] == STAIR_POSITION_LEVEL_1_2[1]);
-		else if (numLevel % 3 == 2) {
+		else if (numLevel == 2) {
 			return pos[0] == STAIR_POSITION_LEVEL_2[0] && pos[1] == STAIR_POSITION_LEVEL_2[1];
-		}else if (numLevel % 3 == 0) {
+		} else if (numLevel == 3) {
 			return (pos[0] == STAIR_POSITION_LEVEL_3_1[0] && pos[1] == STAIR_POSITION_LEVEL_3_1[1])
 					|| (pos[0] == STAIR_POSITION_LEVEL_3_2[0] && pos[1] == STAIR_POSITION_LEVEL_3_2[1]);
 		}
@@ -107,14 +179,13 @@ public class DungeonCrawler_Model {
 				this.monsterPath[i][j] = false;
 			}
 		}
-		if (numLevel % 3 == 1)
+		if (numLevel == 1)
 			setMonsterPath(MONSTER_POSITION_LEVEL_1[0], MONSTER_POSITION_LEVEL_1[1], true);
-		else if (numLevel % 3 == 2) {
+		else if (numLevel == 2) {
 			setMonsterPath(MONSTER_POSITION_LEVEL_2[0], MONSTER_POSITION_LEVEL_2[1], true);
-		}else if (numLevel % 3 == 0) {
+		} else if (numLevel == 3) {
 			setMonsterPath(MONSTER_POSITION_LEVEL_3[0], MONSTER_POSITION_LEVEL_3[1], true);
 		}
-
 
 	}
 
@@ -124,12 +195,16 @@ public class DungeonCrawler_Model {
 				this.playerPath[i][j] = false;
 			}
 		}
-		if (numLevel % 3 == 1)
+		if (numLevel == 1)
 			setPlayerPath(INITIAL_POSITION_LEVEL_1P[0], INITIAL_POSITION_LEVEL_1P[1], true);
-		else if (numLevel % 3 == 2) {
+		else if (numLevel == 2) {
 			setPlayerPath(INITIAL_POSITION_LEVEL_2P[0], INITIAL_POSITION_LEVEL_2P[1], true);
-		}else if (numLevel % 3 == 0) {
+		} else if (numLevel == 3) {
 			setPlayerPath(INITIAL_POSITION_LEVEL_3P[0], INITIAL_POSITION_LEVEL_3P[1], true);
+		} else if (numLevel == 4) {
+			setPlayerPath(INITIAL_POSITION_LEVEL_4P[0], INITIAL_POSITION_LEVEL_4P[1], true);
+		} else if (numLevel == 5) {
+			setPlayerPath(INITIAL_POSITION_LEVEL_5P[0], INITIAL_POSITION_LEVEL_5P[1], true);
 		}
 
 	}
@@ -158,6 +233,7 @@ public class DungeonCrawler_Model {
 		return monsterPath;
 	}
 
+	@SuppressWarnings("resource")
 	public BufferedImage[][] loadLevel(int numLev) {
 		numLevel = numLev;
 		BufferedImage[][] level = new BufferedImage[10][10];
@@ -166,14 +242,7 @@ public class DungeonCrawler_Model {
 		ArrayList<Tile> tileStorage = new ArrayList<Tile>();
 		try {
 			Scanner in = null;
-			if (numLevel % 3 == 1)
-				in = new Scanner(new File("levels/level1.txt"));
-			else if (numLevel % 3 == 2) {
-				in = new Scanner(new File("levels/level2.txt"));
-			} else if (numLevel % 3 == 0) {
-
-				in = new Scanner(new File("levels/level3.txt"));
-			}
+			in = new Scanner(new File("levels/level" + (numLevel) + ".txt"));
 			while (in != null && in.hasNext()) {
 				try {
 					String str = in.next().substring(1);
@@ -202,7 +271,7 @@ public class DungeonCrawler_Model {
 
 		for (int i = 0; i < level.length; i++) {
 			for (int j = 0; j < level[0].length; j++) {
-					level[i][j] = list.remove(0);
+				level[i][j] = list.remove(0);
 			}
 		}
 		// ADD TILES TO GAMEBOARD
@@ -239,7 +308,6 @@ class Tile {
 	public void setWalkable(boolean walkable) {
 		this.walkable = walkable;
 	}
-
 
 	@Override
 	public String toString() {
