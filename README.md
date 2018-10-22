@@ -1,10 +1,9 @@
 # README #
 
 # Overview #
-This repository contains the code written for a game project assignment (Cupertino High School, AP Computer Science, April-May 2016).
-The master branch contains the initial submission of the assignment as a partner project. The contributors for this branch are Akilesh
-Praveen and Samiha Rahman (me). My personal extension (also an assignment) can be seen in the SR branch. The SR branch alone can be used
-to build and play the game.
+This repository contains the code written for assignment where we created an original game(Cupertino High School, AP Computer Science, April-May 2016).The master branch contains the initial submission of the assignment as a partner project, which has two levels made for the game. The contributors for this branch, which sets up foundation for the game (, are Akilesh Praveen and Samiha Rahman (me).
+
+My personal extension debugs and completes the game to have three levels, a bonus level, and final round. This can be seen in the SR branch. The SR branch alone can be used to build and play the game.
 
 # Game Summary #
 Pioneer Parks and Dungeons is set in Pioneer Park of Cupertino High School and revolves around an APCS who lost all their assignments which they must submit. The user goes through three levels as well as a bonus round to collect late passes to turn in with the assignments prior to retrieving the USB with the files. They must avoid the roaming "monster" that guards Pioneer Park in each of these levels; else they lose one of their 3 lives and must replay the level (unless health is 0). The final grade of the course is calculated using the number of late passes collected and a user inputof their overall test percentage.
